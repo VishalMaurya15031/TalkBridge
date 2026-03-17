@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <h1 align="center">✨ Fullstack Chat & Video Calling App ✨</h1>
 
 ![Demo App](/frontend/public/screenshot-for-readme.png)
@@ -53,3 +54,6 @@ cd frontend
 npm install
 npm run dev
 ```
+=======
+# TalkBridge
+>>>>>>> 43edaa66a52dcc8c2fa47c5085266f978192953d
