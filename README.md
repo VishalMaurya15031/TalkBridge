@@ -3,8 +3,6 @@
 
 ![Demo App](/frontend/public/screenshot-for-readme.png)
 
-[Live Link](talk-bridge-z3mr.vercel.app)
-
 Highlights:
 
 - 🌐 Real-time Messaging with Typing Indicators & Reactions
@@ -57,5 +55,11 @@ npm install
 npm run dev
 ```
 =======
+
+## Live Demo
+
+🔗 [Click Here to Visit Website](talk-bridge-z3mr.vercel.app)
+
+
 # TalkBridge
 >>>>>>> 43edaa66a52dcc8c2fa47c5085266f978192953d
