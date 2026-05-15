@@ -5,6 +5,7 @@ import useSignUp from "../hooks/useSignUp";
 import { GoogleLogin } from "@react-oauth/google";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { googleLogin } from "../lib/api";
+import toast from "react-hot-toast";
 
 const SignUpPage = () => {
   const [signupData, setSignupData] = useState({
@@ -32,14 +33,17 @@ const SignUpPage = () => {
   const { mutate: googleAuthMutation } = useMutation({
     mutationFn: googleLogin,
     onSuccess: () => {
+      toast.success("Google Signup Successful!");
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
     onError: (err) => {
       console.error("Google Auth Error:", err);
+      toast.error(err.response?.data?.message || "Google Signup Failed");
     }
   });
 
   const handleGoogleSuccess = (credentialResponse) => {
+    toast.success("Authenticating with server...");
     googleAuthMutation(credentialResponse.credential);
   };
 
@@ -156,7 +160,7 @@ const SignUpPage = () => {
                 <div className="flex justify-center w-full">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
-                    onError={() => console.log("Google Signup Failed")}
+                    onError={() => toast.error("Google popup failed to open or was closed.")}
                   />
                 </div>
 
