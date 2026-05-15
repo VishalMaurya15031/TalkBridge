@@ -58,7 +58,7 @@ npm run dev
 
 ## Live Demo
 
-🔗 [Click Here to Visit Website](talk-bridge-z3mr.vercel.app)
+🔗 [Click Here to Visit Website](https://talk-bridge-oeuj.vercel.app/login)
 
 
 # TalkBridge
