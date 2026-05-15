@@ -1,6 +1,9 @@
 import { upsertStreamUser } from "../lib/stream.js";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export async function signup(req, res) {
   const { email, password, fullName } = req.body;
@@ -99,6 +102,68 @@ export async function login(req, res) {
 export function logout(req, res) {
   res.clearCookie("jwt");
   res.status(200).json({ success: true, message: "Logout successful" });
+}
+
+export async function googleAuth(req, res) {
+  try {
+    const { token } = req.body;
+    
+    if (!token) return res.status(400).json({ message: "Google token missing" });
+
+    // Verify token with Google
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user if they don't exist
+      user = await User.create({
+        email,
+        fullName: name,
+        profilePic: picture,
+        googleId,
+        // password is not required when googleId is present
+      });
+
+      try {
+        await upsertStreamUser({
+          id: user._id.toString(),
+          name: user.fullName,
+          image: user.profilePic || "",
+        });
+      } catch (error) {
+        console.log("Error creating Stream user for google auth:", error);
+      }
+    } else {
+      // If user exists but no googleId, link it
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+    }
+
+    const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("jwt", jwtToken, {
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.log("Error in google auth controller", error);
+    res.status(500).json({ message: "Google authentication failed" });
+  }
 }
 
 export async function onboard(req, res) {

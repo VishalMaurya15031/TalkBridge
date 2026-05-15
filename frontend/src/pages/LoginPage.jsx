@@ -2,6 +2,9 @@ import { useState } from "react";
 import { ShipWheelIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import useLogin from "../hooks/useLogin";
+import { GoogleLogin } from "@react-oauth/google";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { googleLogin } from "../lib/api";
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({
@@ -22,6 +25,22 @@ const LoginPage = () => {
 
   // This is how we did it using our custom hook - optimized version
   const { isPending, error, loginMutation } = useLogin();
+
+  const queryClient = useQueryClient();
+
+  const { mutate: googleAuthMutation } = useMutation({
+    mutationFn: googleLogin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
+    },
+    onError: (err) => {
+      console.error("Google Auth Error:", err);
+    }
+  });
+
+  const handleGoogleSuccess = (credentialResponse) => {
+    googleAuthMutation(credentialResponse.credential);
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -100,6 +119,15 @@ const LoginPage = () => {
                       "Sign In"
                     )}
                   </button>
+                  
+                  <div className="divider">OR</div>
+                  
+                  <div className="flex justify-center w-full">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={() => console.log("Google Login Failed")}
+                    />
+                  </div>
 
                   <div className="text-center mt-4">
                     <p className="text-sm">
