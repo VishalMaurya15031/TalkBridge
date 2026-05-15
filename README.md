@@ -3,6 +3,8 @@
 
 ![Demo App](/frontend/public/screenshot-for-readme.png)
 
+[Live Link](talk-bridge-z3mr.vercel.app)
+
 Highlights:
 
 - 🌐 Real-time Messaging with Typing Indicators & Reactions
