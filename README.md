@@ -3,7 +3,7 @@
 
 ![Demo App](/frontend/public/screenshot-for-readme.png)
 
-[Live Link](talk-bridge-z3mr.vercel.app)
+[Live Link](talk-bridge-z3mr.vercel.app) talk-bridge-z3mr.vercel.app
 
 Highlights:
 
