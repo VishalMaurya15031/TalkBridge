@@ -106,6 +106,14 @@ export function logout(req, res) {
 
 export async function googleAuth(req, res) {
   try {
+    // 1. Check server config
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      return res.status(500).json({ message: "Server Error: GOOGLE_CLIENT_ID is missing in Vercel Environment Variables." });
+    }
+    if (!process.env.MONGO_URI) {
+      return res.status(500).json({ message: "Server Error: MONGO_URI is missing in Vercel Environment Variables." });
+    }
+
     const { token } = req.body;
     
     if (!token) return res.status(400).json({ message: "Google token missing" });
@@ -162,7 +170,13 @@ export async function googleAuth(req, res) {
     res.status(200).json({ success: true, user });
   } catch (error) {
     console.log("Error in google auth controller", error);
-    res.status(500).json({ message: "Google authentication failed" });
+    
+    // Check if it's a database connection error
+    if (error.name === "MongooseError" || error.message.includes("buffering timed out")) {
+      return res.status(500).json({ message: "Database connection failed. Please check your MONGO_URI and MongoDB Network Access." });
+    }
+
+    res.status(500).json({ message: error.message || "Google authentication failed" });
   }
 }
 
